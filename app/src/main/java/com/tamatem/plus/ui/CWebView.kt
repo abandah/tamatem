@@ -1,12 +1,11 @@
 package com.tamatem.plus.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.AttributeSet
-import android.util.Log
-import android.view.View
+import android.webkit.CookieManager
 import android.webkit.WebChromeClient
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.tamatem.plus.R
@@ -14,7 +13,7 @@ import com.tamatem.plus.R
 class CWebView : WebView {
 
 
-    public var listener: WebViewListener? = null
+    var listener: WebViewListener? = null
 
     constructor(context: Context) : super(context)
 
@@ -28,28 +27,25 @@ class CWebView : WebView {
         init()
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun init() {
-        setBackgroundColor(context?.getColor(R.color.black) ?: 0)
-        settings.javaScriptEnabled = true;
-        settings.loadsImagesAutomatically = true;
-        settings.databaseEnabled = true;
-        settings.domStorageEnabled = true;
-        settings.setGeolocationEnabled(true);
-        settings.javaScriptCanOpenWindowsAutomatically = true;
-        isHorizontalScrollBarEnabled = false;
-        settings.allowFileAccess = true;
-        settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW;
-        scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY;
-        settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW;
-        settings.pluginState = WebSettings.PluginState.ON;
-        settings.mediaPlaybackRequiresUserGesture = false;
-        settings.mixedContentMode = 0;
-        setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
+        //change background color to black
+        setBackgroundColor(context?.getColor(R.color.black) ?: 0)
+
+        //enable javascript
+        settings.javaScriptEnabled = true
+
+        //enable dom storage
+        settings.domStorageEnabled = true
+
+        // enable third party cookies
+        CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
+
+        // set webview chrome client
         webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
 
-                Log.e("TAGTAG", "onProgressChanged: $newProgress")
 
                 if (newProgress >= 100) {
 
@@ -57,9 +53,9 @@ class CWebView : WebView {
 
 
                 }
-                if(newProgress >= 70){
+                if (newProgress >= 70) {
                     listener?.showLoader(false)
-                } else{
+                } else {
                     listener?.showLoader(true)
                 }
                 super.onProgressChanged(view, newProgress)
@@ -67,6 +63,7 @@ class CWebView : WebView {
 
         }
 
+        // set webview client
         webViewClient = object : WebViewClient() {
             override fun onLoadResource(view: WebView?, url: String?) {
                 super.onLoadResource(view, url)
@@ -75,15 +72,14 @@ class CWebView : WebView {
             }
 
 
+            @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                Log.e("TAGTAG", "shouldOverrideUrlLoading: " + url)
                 view?.loadUrl(url ?: "")
                 return false
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                Log.e("TAGTAG", "onPageFinished: " + url)
                 listener?.showLoader(false)
 
             }
@@ -94,13 +90,13 @@ class CWebView : WebView {
             }
         }
         // if you want to enable zoom feature
-        settings.setSupportZoom(true)
+
     }
 
 
     interface WebViewListener {
         fun onPageFinished(view: WebView?, url: String?, canGoBack: Boolean, canGoForward: Boolean)
-        fun showLoader( show : Boolean)
+        fun showLoader(show: Boolean)
 
     }
 

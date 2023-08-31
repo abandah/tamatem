@@ -7,13 +7,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.tamatem.plus.R
-import com.tamatem.plus.back.IOnBackPressed
-import com.tamatem.plus.bases.BaseActivity
 import com.tamatem.plus.bases.BaseFragment
-import com.tamatem.plus.databinding.ActivityMainBinding
-import com.tamatem.plus.databinding.FragmentBrowserBinding
 import com.tamatem.plus.databinding.FragmentWelcomeBinding
-import com.tamatem.plus.ui.browser.BrowserViewModel
 
 class WelcomeFragment : BaseFragment(), WelcomeInterface  {
 

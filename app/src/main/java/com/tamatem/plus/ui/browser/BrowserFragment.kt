@@ -1,13 +1,11 @@
 package com.tamatem.plus.ui.browser
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
-import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.tamatem.plus.R
@@ -20,59 +18,70 @@ import com.tamatem.plus.ui.CWebView
 class BrowserFragment : BaseFragment(), CWebView.WebViewListener, IOnBackPressed {
 
     var viewModel: BrowserViewModel? = null
-    var binding: FragmentBrowserBinding? = null
+    private var binding: FragmentBrowserBinding? = null
+
+    private var webView: CWebView? = null
+    private var backButton : MenuItem? = null
+    private var forwardButton : MenuItem? = null
+    private var refreshButton : MenuItem? = null
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel = ViewModelProvider(this)[BrowserViewModel::class.java].apply {
-
-        }
-
+        viewModel = ViewModelProvider(this)[BrowserViewModel::class.java]
         binding = FragmentBrowserBinding.inflate(layoutInflater).apply {
             lifecycleOwner = this@BrowserFragment
             viewModel = this@BrowserFragment.viewModel
         }
-        var callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                Log.e("TAGTAG", "handleOnBackPressed: ${webView?.url}")
-            }
-        }
-        requireActivity().getOnBackPressedDispatcher().addCallback(viewLifecycleOwner, callback);
-
         return binding!!.root
     }
 
-    var webView: CWebView? = null
-    var backButton : MenuItem? = null
-    var forwardButton : MenuItem? = null
-    var refreshButton : MenuItem? = null
 
 
     override fun onStart() {
         super.onStart()
 
+        initViews()
+
+
+        // run webview
+        webView?.loadUrl("https://tamatemplus.com")
+    }
+
+    private fun initViews() {
+        //init views
         backButton = binding?.topAppBar?.menu?.findItem(R.id.back)
         forwardButton = binding?.topAppBar?.menu?.findItem(R.id.forward)
         refreshButton = binding?.topAppBar?.menu?.findItem(R.id.refresh)
+
+        // init webview and set listener
+        webView = binding?.webView
+        webView?.listener = this
+
+
+        // onClick navigation icon
         binding!!.topAppBar.setNavigationOnClickListener {
             it.findNavController().navigate(R.id.action_browserFragment_to_welcomeFragment)
         }
 
+
+        // onClick menu items
         binding!!.topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
-                com.tamatem.plus.R.id.back -> {
+                R.id.back -> {
                     webView?.goBack()
                     true
                 }
 
-                com.tamatem.plus.R.id.forward -> {
+               R.id.forward -> {
                     webView?.goForward()
                     true
                 }
 
-                com.tamatem.plus.R.id.refresh -> {
+                R.id.refresh -> {
                     webView?.reload()
                     true
                 }
@@ -80,9 +89,6 @@ class BrowserFragment : BaseFragment(), CWebView.WebViewListener, IOnBackPressed
                 else -> false
             }
         }
-        webView = binding?.webView
-        webView?.listener = this
-        webView?.loadUrl("https://tamatemplus.com")
     }
 
     override fun onDestroy() {
@@ -92,17 +98,20 @@ class BrowserFragment : BaseFragment(), CWebView.WebViewListener, IOnBackPressed
 
 
 
+    // to handle back and forward buttons in webview
     override fun onPageFinished(
         view: WebView?,
         url: String?,
         canGoBack: Boolean,
         canGoForward: Boolean
     ) {
-        backButton?.isEnabled = canGoBack?:false
+        backButton?.isEnabled = canGoBack
         backButton?.icon?.alpha = if(canGoBack) 255 else 100
-        forwardButton?.isEnabled = canGoForward?:false
+        forwardButton?.isEnabled = canGoForward
         forwardButton?.icon?.alpha = if(canGoForward) 255 else 100
 
+
+        // in home page disable back and forward buttons
         if(webView?.url == "https://tamatemplus.com/" || webView?.url == "https://tamatemplus.com/home"){
             backButton?.isEnabled = false
             backButton?.icon?.alpha =100
