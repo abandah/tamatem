@@ -23,7 +23,6 @@ class MainActivity : BaseActivity() {
 
     // implement on back pressed to handle back button in fragments
     @Deprecated("Deprecated in Java")
-    @Suppress("DEPRECATION")
     override fun onBackPressed() {
 
         val navHostFragment = supportFragmentManager.fragments.first() as? NavHostFragment
@@ -36,7 +35,7 @@ class MainActivity : BaseActivity() {
                     }
                 }else{
                     if (doubleBackToExitPressedOnce) {
-                        super.onBackPressed()
+                       finishAffinity()
                         return
                     }
 
