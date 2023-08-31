@@ -112,7 +112,7 @@ class BrowserFragment : BaseFragment(), CWebView.WebViewListener, IOnBackPressed
     }
 
     override fun showLoader(show: Boolean) {
-      //  viewModel?.visibilityOfLoading?.value = if (show) View.VISIBLE else View.GONE
+        viewModel?.visibilityOfLoading?.value = if (show) View.VISIBLE else View.GONE
     }
 
     override fun onBackPressed(): Boolean {

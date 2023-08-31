@@ -48,16 +48,21 @@ class CWebView : WebView {
 
         webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                super.onProgressChanged(view, newProgress)
+
+                Log.e("TAGTAG", "onProgressChanged: $newProgress")
+
                 if (newProgress >= 100) {
-                    Log.e(
-                        "TAGTAG",
-                        "{canGoBack()} ${canGoBack()} {canGoForward()} ${canGoForward()}"
-                    )
+
                     listener?.onPageFinished(view, view?.url, canGoBack(), canGoForward())
 
 
                 }
+                if(newProgress >= 70){
+                    listener?.showLoader(false)
+                } else{
+                    listener?.showLoader(true)
+                }
+                super.onProgressChanged(view, newProgress)
             }
 
         }
@@ -65,24 +70,21 @@ class CWebView : WebView {
         webViewClient = object : WebViewClient() {
             override fun onLoadResource(view: WebView?, url: String?) {
                 super.onLoadResource(view, url)
-                Log.e(
-                    "TAGTAG",
-                    "{canGoBack()} ${canGoBack()} {canGoForward()} ${canGoForward()}"
-                )
                 listener?.onPageFinished(view, view?.url, canGoBack(), canGoForward())
 
             }
 
 
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                Log.e("TAGTAG", "shouldOverrideUrlLoading: " + url)
                 view?.loadUrl(url ?: "")
-                return true
+                return false
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
+                Log.e("TAGTAG", "onPageFinished: " + url)
                 listener?.showLoader(false)
-                Log.e("TAGTAG", "{canGoBack()} ${canGoBack()} {canGoForward()} ${canGoForward()}")
 
             }
 
